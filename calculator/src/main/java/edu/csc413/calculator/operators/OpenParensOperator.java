@@ -1,4 +1,16 @@
 package edu.csc413.calculator.operators;
 
-public class OpenParensOperator {
+import edu.csc413.calculator.evaluator.Operand;
+
+public class OpenParensOperator extends Operator  {
+    public Operand execute (Operand first, Operand second){
+        System.out.println("*****Parenthesis error******");
+        throw new RuntimeException("*****Parenthesis error******");
+    }
+
+    public int priority() {
+        return 4;
+    }
+    public String print() {return "(";}
 }
+
