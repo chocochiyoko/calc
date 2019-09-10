@@ -14,7 +14,7 @@ public class EvaluatorUI extends JFrame implements ActionListener {
     // numbered from left to right, top to bottom
     // bText[] array contains the text for corresponding buttons
     private static final String[] bText = {
-            "7", "8", "9", "+", "4", "5", "6", "- ", "1", "2", "3",
+            "7", "8", "9", "+", "4", "5", "6", "-", "1", "2", "3",
             "*", "0", "^", "=", "/", "(", ")", "C", "CE"
     };
 
@@ -71,7 +71,29 @@ public class EvaluatorUI extends JFrame implements ActionListener {
      *                    button is pressed.
      */
     public void actionPerformed(ActionEvent eventObject) {
-
-
+        String command = eventObject.getActionCommand();
+        if (command == "C") {
+            txField.setText("");
+        }
+        else if (command == "CE"){
+            String output ="";
+            String input = txField.getText();
+            for (int i = input.length() - 1; i > 0; i-- ){
+                if ((int)input.charAt(i) < 48 || (int)input.charAt(i) > 57){
+                    output = input.substring(0, i + 1);
+                    i = 0;
+                }
+            }
+            txField.setText(output);
+        }
+        else if (command == "="){
+            String input = txField.getText();
+            Evaluator calc = new Evaluator();
+            int output = calc.eval(input);
+            txField.setText(Integer.toString(output));
+        }
+        else {
+                txField.setText(txField.getText() + command);
+        }
     }
 }
