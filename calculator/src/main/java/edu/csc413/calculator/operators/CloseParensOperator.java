@@ -11,5 +11,4 @@ public class CloseParensOperator extends Operator {
     public int priority() {
         return Integer.MIN_VALUE;
     }
-    public String print() {return "(";}
 }

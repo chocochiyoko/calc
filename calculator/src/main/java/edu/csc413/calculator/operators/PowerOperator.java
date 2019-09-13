@@ -10,5 +10,5 @@ public class PowerOperator extends Operator{
     }
 
     public int priority() { return 3;    }
-    public String print() {return "^";}
+
 }

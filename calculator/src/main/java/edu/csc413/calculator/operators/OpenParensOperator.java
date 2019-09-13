@@ -11,6 +11,6 @@ public class OpenParensOperator extends Operator  {
     public int priority() {
         return Integer.MAX_VALUE;
     }
-    public String print() {return "(";}
+
 }
 

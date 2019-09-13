@@ -32,7 +32,7 @@ public abstract class Operator {
      * @return as an int, priority of operator
      */
     public abstract int priority();
-    public abstract String print();
+
 
     public Operand execute(Operand op1, Operand op2) {
         return null;

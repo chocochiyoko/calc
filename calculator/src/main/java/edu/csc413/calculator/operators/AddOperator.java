@@ -12,5 +12,5 @@ public class AddOperator extends Operator{
     public int priority() {
         return 1;
     }
-    public String print() {return "+";}
+
 }

@@ -74,6 +74,7 @@ public class EvaluatorDriver {
                             yourResult,
                             expectedResult.equals(yourResult) ? "Passed" : "Failed");
                 }catch(Exception ex){
+                    System.out.println(ex.toString());
                     System.out.printf("%45s %5s : %5s : %7s%n", expression,
                             expectedResult,
                             "failed",

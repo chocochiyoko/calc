@@ -11,5 +11,5 @@ public class DivideOperator extends Operator{
     public int priority() {
         return 2;
     }
-    public String print() {return "/";}
+
 }
