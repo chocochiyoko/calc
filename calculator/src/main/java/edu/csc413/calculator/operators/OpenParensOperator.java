@@ -9,7 +9,7 @@ public class OpenParensOperator extends Operator  {
     }
 
     public int priority() {
-        return 4;
+        return Integer.MAX_VALUE;
     }
     public String print() {return "(";}
 }

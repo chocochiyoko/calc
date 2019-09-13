@@ -11,18 +11,20 @@ import java.util.StringTokenizer;
 public class Evaluator {
     private Stack<Operand> operandStack;
     private Stack<Operator> operatorStack;
+    private Stack<String> tokenStack;
     private StringTokenizer tokenizer;
     private static final String DELIMITERS = "+-*^/() ";
 
     public Evaluator() {
         operandStack = new Stack<>();
         operatorStack = new Stack<>();
-
+        //the token stack is only used for implicit multiplication and negative numbers.
+        tokenStack = new Stack<>();
     }
 
     public int eval(String expression) {
         String token;
-        int parens=0;
+        System.out.println(expression);
         // The 3rd argument is true to indicate that the delimiters should be used
         // as tokens, too. But, we'll need to remember to filter out spaces.
         this.tokenizer = new StringTokenizer(expression, DELIMITERS, true);
@@ -32,8 +34,19 @@ public class Evaluator {
 
             // filter out spaces
             if (!(token = this.tokenizer.nextToken()).equals(" ")) {
+
                 // check if token is an operand
+                // if it is not the first token in the expression
+                //check if the last token was ")"
+                //if it was push a "*" onto Operator Stack
+
                 if (Operand.check(token)) {
+                    if (!tokenStack.isEmpty()){
+                    if (tokenStack.peek().equals(")")){
+                        operatorStack.push(Operator.getOperator("*"));
+                    }
+                    }
+
                     operandStack.push(new Operand(token));
                 } else {
                     if (!Operator.check(token)) {
@@ -41,51 +54,68 @@ public class Evaluator {
                         throw new RuntimeException("*****invalid token******");
                     }
 
-                    // TODO Operator is abstract - these two lines will need to be fixed:
-                    // The Operator class should contain an instance of a HashMap,
-                    // and values will be instances of the Operators.  See Operator class
-                    // skeleton for an example.
+
                     Operator newOperator = Operator.getOperator(token);
+
                     //if operator stack is empty push newOperator and go directly to checking next token
-                    if(operatorStack.isEmpty()){
+                    //unless last operator is ")" then push a "*" before the "("
+                    if (newOperator.priority() == Integer.MAX_VALUE) {
+
+                        if (!tokenStack.isEmpty() && !operandStack.isEmpty()){
+                            if (Operand.check(tokenStack.peek()) || tokenStack.peek().equals(")")) {
+                                operatorStack.push(Operator.getOperator("*"));
+                                System.out.println("pushed * hello");
+                            }
+                        }
+
                         operatorStack.push(newOperator);
+                        tokenStack.push(token);
                         continue;
                     }
-                    //if operator is "(" push it to stack and go directly to checking next token
-                    else if (newOperator.priority() == 4){
+                    //if operator stack is empty push new Operator onto stack
+                    //unless the token is "-", then push a -1 and a "*"
+                    else if(operatorStack.isEmpty()){
+                        if (token.equals("-") && tokenStack.isEmpty()){
+                            System.out.println("pushing -1");
+                            operatorStack.push(Operator.getOperator("*"));
+                            operandStack.push(new Operand(-1));
+                            tokenStack.push(token);
+                            continue;
+                        }
                         operatorStack.push(newOperator);
-                        continue;
+
                     }
 
-                    //if operator is ")" execute everything on stacks until "("
-                    else if (newOperator.priority() == 5){
 
-                        while (!operatorStack.isEmpty() && operatorStack.peek().priority() !=4 ){
+                    //if operator is ")" execute everything on stacks until "(" then pop the "("
+                    else if (newOperator.priority() == Integer.MIN_VALUE){
 
-                                    Operator oldOpr = operatorStack.pop();
-                                    Operand op2 = operandStack.pop();
-                                    Operand op1 = operandStack.pop();
-                                   operandStack.push(oldOpr.execute(op1, op2));
+
+                            while (!operatorStack.isEmpty() && operatorStack.peek().priority() != Integer.MAX_VALUE) {
+
+                                helper (operandStack.pop(), operandStack.pop(), operatorStack.pop());
 
                             }
 
-                        //pop "("
                             operatorStack.pop();
 
                         }
+                    else if ((token.equals("-") && tokenStack.peek().equals("("))) {
+                            System.out.println("pushing -1");
+                            operatorStack.push(Operator.getOperator("*"));
+                            operandStack.push(new Operand(-1));
 
+                    }
                         //otherwise execute operations according to priority
-                        //push newOperator onto stack once:
+                        //push newOperator onto stack if:
                         //stack is empty
                         //top of stack is "("
                         //it is higher priority than top of stack
                    else try {
-                        while (operatorStack.peek().priority() >= newOperator.priority() && operatorStack.peek().priority() != 4) {
 
-                            Operator oldOpr = operatorStack.pop();
-                            Operand op2 = operandStack.pop();
-                            Operand op1 = operandStack.pop();
-                            operandStack.push(oldOpr.execute(op1, op2));
+                        while (operatorStack.peek().priority() >= newOperator.priority() && operatorStack.peek().priority() != Integer.MAX_VALUE) {
+
+                            helper (operandStack.pop(), operandStack.pop(), operatorStack.pop());
                         }
                             operatorStack.push(newOperator);
                     }
@@ -93,33 +123,31 @@ public class Evaluator {
                         operatorStack.push(newOperator);
                     }
                 }
+
             }
+            tokenStack.push(token);
         }
 
 
         int result=0;
         Operand op1, op2;
         Operator thisOperator;
+
         //if operator stack is empty the whole expression must have been in parens.
         //the result is just whatever is on the operand stack.
-        if (operatorStack.isEmpty()){
-            result=operandStack.pop().getValue();
-        }
+
         //execute remaining stack
         while(!operatorStack.isEmpty())
         {
-
-            op2=operandStack.pop();
-            op1=operandStack.pop();
-            thisOperator=operatorStack.pop();
-            result = thisOperator.execute(op1,op2).getValue();
-            operandStack.push(thisOperator.execute(op1,op2));
+           helper (operandStack.pop(), operandStack.pop(), operatorStack.pop());
 
         }
-
-
-
+        result=operandStack.pop().getValue();
         return result;
     }
+    public void helper (Operand op2, Operand op1, Operator operator){
+        operandStack.push(operator.execute(op1, op2));
+    }
+
 }
 

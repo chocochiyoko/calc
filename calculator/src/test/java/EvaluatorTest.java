@@ -126,5 +126,15 @@ public class EvaluatorTest {
         assertEquals(1176,res);
     }
 
+    @Test
+    void testExpression13(){
+        String exp = "2+4*5-8+9^2";
+        int res;
+
+        Evaluator ev = new Evaluator();
+        res = ev.eval(exp);
+        assertEquals(95,res);
+    }
+
 
 }
